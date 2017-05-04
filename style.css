@@ -1,0 +1,14 @@
+body {
+    margin: 30px;
+}
+.key-section {
+        padding: 1px 5px 1px 5px;
+    background-color: #e5e5e5;
+    font-weight: bold;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+.form_table {
+    padding-bottom: 30px;
+}
