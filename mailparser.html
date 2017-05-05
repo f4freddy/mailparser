@@ -1,40 +1,61 @@
 <html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
 
-    </head>
-    <body>
-        <div class="form_border">
-            <table class="form_table">
+  </head>
+  <body>
+    <div class="form_border">
+        <h1>E-Mail Header Analyzer</h1>
+      <table class="form_table">
 
-                <tbody><tr>
-                        <td>E-mail Header:</td>
-                    </tr>
-                    <tr>
-                        <td><textarea cols="70" rows="10" id="email-header-data" name="p_header"></textarea></td>
-                    </tr>
+        <tbody><tr>
+            <td>E-mail Header:</td>
+          </tr>
+          <tr>
+            <td><textarea cols="70" rows="10" id="email-header-data" name="p_header"></textarea></td>
+          </tr>
 
-                    <tr>
-                        <td>
-                            <input type="submit" id="form_button" class="form_button" value=" Analyze E-mail Header " name="submit">
+          <tr>
+            <td>
+              <input type="submit" id="form_button" class="form_button" value=" Analyze E-mail Header " name="submit">
 
-                        </td>
-                    </tr>
+            </td>
+          </tr>
 
-                </tbody>
-            </table>
-        </div>
+        </tbody>
+      </table>
+    </div>
 
-        <div>
-            <table id="dataTable">
+    <div>
+      <table id="dataTable">
 
-                <tbody>
+        <tbody>
 
-                </tbody>
-            </table>
-        </div>
+        </tbody>
+      </table>
+    </div>
 
-        <script src="mailparser.js"></script>
-    </body>
+    <h2>Received Overview</h2>
+    <div>
+      <table id="dataTable1">
+
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Received Details</h2>
+    <div>
+      <table id="dataTable2">
+
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+
+    <script src="mailparser.js"></script>
+  </body>
 </html>
