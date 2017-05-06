@@ -2,21 +2,21 @@ body {
     margin: 30px;
 }
 td {
-  background-color: #f5f5f5;
+    background-color: #f5f5f5;
 }
 tr.empty {
-  height:15px;
-  td {
-    background-color: #ff0000;
-  }
+    height:15px;
+    td {
+        background-color: #ff0000;
+    }
 }
 tr.empty td {
- 
+
     background-color: ffffff;
-  
+
 }
 .key-section {
-        padding: 1px 5px 1px 5px;
+    padding: 1px 5px 1px 5px;
     background-color: #e5e5e5;
     font-weight: bold;
     white-space: nowrap;
@@ -45,4 +45,31 @@ h1 {
     padding-bottom: 2px;
     border-bottom: 2px solid #c0c0c0;
     margin: 0 0 15px 0;
+}
+
+.key-section.yello-notice { 
+    padding: 1px 5px 1px 5px;
+    background-color: #ffff88;
+    font-weight: bold;
+    white-space: nowrap;
+    vertical-align: top;
+}
+.yello-notice { 
+    padding: 1px 5px 1px 5px;
+    background-color: #ffffcc;
+}
+.key-section.green-notice { 
+    padding: 1px 5px 1px 5px;
+    background-color: #aaffaa;
+    font-weight: bold;
+    white-space: nowrap;
+    vertical-align: top;
+}
+.green-notice { 
+    padding: 1px 5px 1px 5px;
+    background-color: #ddffdd;
+}
+body, p, td, li {
+    font-family: verdana, tahoma, helvetica, arial, sans-serif;
+    font-size: 10pt;
 }
