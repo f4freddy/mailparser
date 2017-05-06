@@ -14,7 +14,7 @@
                 $.each(data, function (index, data) {
                     var i = data.key;
                     var val = data.value;
-                    
+
                     if (i !== 'details') {
                         val = val.replace("&", "&amp;");
                         val = val.replace("<", "&lt;");
@@ -23,20 +23,19 @@
                     } else {
 
                         $.each(val, function (j, k) {
-                            
+
                             $.each(k[0], function (m, n) {
                                 $('#dataTable1 tbody').append('<tr><td class="key-section">' + m + '</td><td> ' + n + '</td></tr>')
                             });
                             $.each(k[1], function (m, n) {
-                                 console.log(m,n);
-                                if(m=='msg'){
-                                   
-                                  $.each(n, function (o, p) {
-                                     $('#dataTable2 tbody').append('<tr><td class="key-section '+p.class+'">' + p.type + '</td><td class="'+p.class+'"> ' + p.msg + '</td></tr>') 
-                                  });  
-                                }else{
-                                $('#dataTable2 tbody').append('<tr><td class="key-section">' + m + '</td><td> ' + n + '</td></tr>')
-                            }
+                                if (m == 'msg') {
+
+                                    $.each(n, function (o, p) {
+                                        $('#dataTable2 tbody').append('<tr><td class="key-section ' + p.class + '">' + p.type + '</td><td class="' + p.class + '"> ' + p.msg + '</td></tr>')
+                                    });
+                                } else {
+                                    $('#dataTable2 tbody').append('<tr><td class="key-section">' + m + '</td><td> ' + n + '</td></tr>')
+                                }
                             });
                             $('#dataTable1 tbody').append('<tr class="empty"><td class=""></td><td> </td></tr>')
                             $('#dataTable2 tbody').append('<tr class="empty"><td class=""></td><td></td></tr>')
