@@ -113,21 +113,28 @@ class PlancakeEmailParser {
         $v = 0;
         $this->rawHeaderFieldsIndex = 0;
         foreach ($lines as $line) {
-            if (self::isNewLine($line)) {
-                // end of headers
-                $this->rawBodyLines = array_slice($lines, $i);
-                break;
-            }
+//            if (self::isNewLine($line)) {
+//                print_r($line);
+//                print_r('$$$$$$$$$$$$$$$$$$$$$$$$$$$');
+//                // end of headers
+//                $this->rawBodyLines = array_slice($lines, $i);
+//                break;
+//            }
 
             if ($this->isLineStartingWithPrintableChar($line)) { // start of new header
                 preg_match('/([^:]+): ?(.*)$/', $line, $matches);
                 $newHeader = strtolower($matches[1]);
                 $value = $matches[2];
 
-                if ($currentHeader == 'date') {
+                if ($currentHeader == 'date' && gmdate('Y', strtotime($this->rawFields['date'])) !='1970' ){
+                    
                     $this->rawHeaderFieldsIndex++;
                     $this->rawHeaderFields[$this->rawHeaderFieldsIndex]['key'] = 'date(Formatted)';
                     $this->rawHeaderFields[$this->rawHeaderFieldsIndex]['value'] = gmdate('m/d/Y H:i:s', strtotime($this->rawFields['date'])) . ' UTC ';
+                }else if($currentHeader == 'date'){
+                    $this->rawHeaderFieldsIndex++;
+                    $this->rawHeaderFields[$this->rawHeaderFieldsIndex]['key'] = 'date(Formatted)';
+                    $this->rawHeaderFields[$this->rawHeaderFieldsIndex]['value'] = 'Not Available';
                 }
 
                 $this->rawFields[$newHeader] = $value;
@@ -149,8 +156,8 @@ class PlancakeEmailParser {
                     if ($newHeader == 'received') {
                         $this->recivedHeaders[$v] .= substr($line, 1);
                     }
+                    }
                 }
-            }
             $i++;
         }
     }
@@ -164,6 +171,30 @@ class PlancakeEmailParser {
         $ini += strlen($start);
         $len = strpos($string, $end, $ini) - $ini;
         return substr($string, $ini, $len);
+    }
+     
+    public function format_seconds($seconds) {
+        if($seconds==0){
+            return '0s';
+        }
+        $hours = floor($seconds / 3600);
+        $minutes = floor($seconds % 3600 / 60);
+        $second = $seconds % 60;
+        $time = '';
+
+
+        if ($hours >= 1) {
+            $time = $hours . 'h ';
+        }
+        if ($minutes >= 1) {
+            $time .= $minutes . 'm ';
+        }
+
+        if ($second >= 1) {
+            $time .= $second . 's ';
+        }
+
+        return $time;
     }
 
     public function ip_is_private($ip) {
@@ -227,7 +258,10 @@ class PlancakeEmailParser {
             $senderIp = $this->get_string_between($data, '[', ']');
             $senderHostName = $this->get_string_between($this->delete_all_between('[', ']', $data), '(', ')');
             $senderName = $this->get_string_between($this->delete_all_between('[', ']', $data), '(', ')');
-
+            if (strpos($string, '(') !== false && strpos($string, '[') !== false){
+                $senderName =$this->get_string_between($data,'(','['); 
+            }
+            
             if (!$senderHostName) {
                 $senederDataInfo = explode(' ', $data);
                 $FromInfo = $senederDataInfo[1];
@@ -239,7 +273,11 @@ class PlancakeEmailParser {
         }
 
         $timeArray = explode(';', $string);
-        $time = (count($timeArray) > 1 ) ? gmdate('m/d/Y H:i:s', strtotime(end($timeArray))) . ' UTC ' : 'Invalid receive time';
+        $timeString = $this->delete_all_between('(', ')', $this->delete_all_between('[', ']', end($timeArray)));
+        $time = ($timeString ) ? gmdate('m/d/Y H:i:s', strtotime($timeString)) . ' UTC ' : '';
+        if(gmdate('Y', strtotime($time))  =='1970'){
+           $time = '';
+        }
         $rowData = explode(' ', $string);
 
         $for = trim($this->get_string_between($string, 'for', ';'));
@@ -247,6 +285,11 @@ class PlancakeEmailParser {
 
         $by = '';
         $byExt = $this->data_between_paranthesis(trim($this->get_string_between($string, 'by', 'for')));
+        if(strpos($string, 'envelope-from') !== false) {
+            $byExtArray = explode('envelope-from', $byExt);
+            $byExt =$byExtArray[0];
+            $envp =$byExtArray[1];
+        }
         $With = '';
         for ($i = 0; $i < count($rowData); $i++) {
 
@@ -263,7 +306,7 @@ class PlancakeEmailParser {
         $duration = 'NA';
 
         if ($time != '' && $this->emailDuration != '') {
-            $duration = (strtotime($time) - strtotime($this->emailDuration)) . 's';
+            $duration = $this->format_seconds(strtotime($time) - strtotime($this->emailDuration));
         } else if ($time) {
 
             $this->emailDuration = $time;
@@ -295,6 +338,13 @@ class PlancakeEmailParser {
             $warn[$noticeCount]['class'] = 'yello-notice';
             $noticeCount++;
         }
+        if(trim($senderName)=='' && trim($senderAdreess)!=''){
+            $senderName=$senderAdreess;
+            $warn[$noticeCount]['msg'] = 'The sender is possible incorrect.';
+            $warn[$noticeCount]['type'] = 'Notice';
+            $warn[$noticeCount]['class'] = 'yello-notice';
+            $noticeCount++;
+        }
 
         $overview = array(
             'Entry' => $index,
@@ -314,9 +364,11 @@ class PlancakeEmailParser {
 
         if (trim($senderAdreess))
             $details['Sender (from)'] = htmlspecialchars($senderAdreess);
+        if (trim($envp))
+            $details['Envelop-Sender'] = htmlspecialchars($envp);
 
-        $details['Received By'] = ($by) ? htmlspecialchars($by) : 'Not available';
-        if (trim($byExt))
+        $details['Received By'] = ($by && $senderName) ? htmlspecialchars($by) : 'Not available';
+        if (trim($byExt) && $senderName)
             $details['Received By(Ext.)'] = htmlspecialchars($byExt);;
         $details['Received With'] = ($With) ? htmlspecialchars($With) : '';
         $details['Receive Times'] = ($time) ? $time : 'Not available';
@@ -513,7 +565,7 @@ class PlancakeEmailParser {
             $index++;
         }
         $this->rawHeaderFieldsIndex++;
-        $this->rawHeaderFields[$this->rawHeaderFieldsIndex]['key'] = details;
+        $this->rawHeaderFields[$this->rawHeaderFieldsIndex]['key'] = 'details';
         $this->rawHeaderFields[$this->rawHeaderFieldsIndex]['value'] = $senderDetails;
         return $this->rawHeaderFields;
     }
