@@ -246,12 +246,16 @@ class PlancakeEmailParser {
 
         return $a;
     }
-
+    
+    public function get_data_between_char($string,$firstChr,$lastChr){
+         $start= strpos($string, $firstChr);
+            $end= strpos($string, $lastChr);
+            $startIndex = min($start, $end)+1;
+            $length = abs($start - $end)-1;
+            $newString = substr($string, $startIndex, $length);
+            return $newString;
+    }
     public function get_header_data($string, $start, $end, $index, $num) {
-
-
-
-
         $data = $this->get_string_between($string, $start, $end);
         $senderIp = '';
         if ($data) {
@@ -281,14 +285,22 @@ class PlancakeEmailParser {
         $rowData = explode(' ', $string);
 
         $for = trim($this->get_string_between($string, 'for', ';'));
+        if(strpos($for, '<') !== false) {
+            $for = $this->get_data_between_char($for, '<', '>');
+        }
 
 
         $by = '';
         $byExt = $this->data_between_paranthesis(trim($this->get_string_between($string, 'by', 'for')));
+        $byExt1 = trim($this->get_string_between($string, 'by', ';'));
         if(strpos($string, 'envelope-from') !== false) {
             $byExtArray = explode('envelope-from', $byExt);
             $byExt =$byExtArray[0];
             $envp =$byExtArray[1];
+        }else if (strpos($byExt, '(') !== false){
+            $byExt = trim($this->get_string_between($byExt, '(', ')'));
+        }else if (strpos($byExt1, '(') !== false){           
+            $byExt = $this->get_data_between_char($byExt1, '(', ')');
         }
         $With = '';
         for ($i = 0; $i < count($rowData); $i++) {
@@ -369,7 +381,7 @@ class PlancakeEmailParser {
 
         $details['Received By'] = ($by && $senderName) ? htmlspecialchars($by) : 'Not available';
         if (trim($byExt) && $senderName)
-            $details['Received By(Ext.)'] = htmlspecialchars($byExt);;
+            $details['Received By(Ext.)'] = htmlspecialchars($byExt);
         $details['Received With'] = ($With) ? htmlspecialchars($With) : '';
         $details['Receive Times'] = ($time) ? $time : 'Not available';
         $details['Receive Duration'] = $duration;
